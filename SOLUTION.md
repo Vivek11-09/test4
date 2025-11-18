@@ -50,6 +50,50 @@ Integration & Verification
 - `DataContext` supports `REACT_APP_API_URL` override if you prefer an explicit backend URL in `.env.local`.
 - I created `scripts/add_and_check.js` and used it to POST a new item and confirm the API returns it; the new item appears in `data/items.json`.
 
+Item CRUD (commands to verify)
+------------------------------
+Below are example commands you can run locally to verify item operations against the running backend (http://localhost:3001).
+
+Create (POST)
+```bash
+curl -s -X POST http://localhost:3001/api/items \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My Item","price":19.99}' | jq
+```
+PowerShell (equivalent):
+```powershell
+$body = @{ name = 'My Item'; price = 19.99 } | ConvertTo-Json
+Invoke-RestMethod -Uri 'http://localhost:3001/api/items' -Method Post -Body $body -ContentType 'application/json'
+```
+
+Read (list) — supports pagination and search
+```bash
+# first page, limit 20
+curl -s "http://localhost:3001/api/items?page=1&limit=20" | jq
+
+# search by q (server-side search)
+curl -s "http://localhost:3001/api/items?q=My&page=1&limit=20" | jq
+```
+
+Read (single item)
+```bash
+curl -s http://localhost:3001/api/items/123 | jq
+```
+
+Update / Delete
+----------------
+The current API implements Create (POST) and Read (GET list + GET by id). Update (PUT/PATCH) and Delete (DELETE) endpoints are not yet implemented in `src/routes/items.js`.
+
+If you add update/delete, quick curl examples would be:
+```bash
+# Update (example)
+curl -s -X PUT http://localhost:3001/api/items/123 -H "Content-Type: application/json" -d '{"name":"Updated","price":29.99}' | jq
+
+# Delete (example)
+curl -s -X DELETE http://localhost:3001/api/items/123 | jq
+```
+
+
 Quality gates
 -------------
 - Backend tests: PASS (Jest tests executed and passed).
